@@ -1,0 +1,42 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "openvoice"
+dynamic = ["version"]
+description = "A voice pronunciation assessment library for Python."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.9"
+authors = [
+    { name = "Siyu Zeng", email = "siyu_zeng1@brown.edu" },
+]
+keywords = ["voice", "pronunciation", "speech", "assessment"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Multimedia :: Sound/Audio :: Speech",
+]
+dependencies = [
+    "eng-to-ipa",
+    "numpy",
+    "torch",
+    "transformers",
+    "sounddevice",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[project.urls]
+Homepage = "https://github.com/stringbot/OpenVoice"
+
+[tool.hatch.version]
+path = "openvoice/__init__.py"
