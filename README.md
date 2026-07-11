@@ -7,7 +7,7 @@ https://github.com/user-attachments/assets/d95f2955-d778-4ab6-8f20-2872627a4e2c
 ## Installation
 
 ```bash
-pip install pronounce-assess   # numpy, torch, transformers, sounddevice, eng-to-ipa
+pip install pronounce-assess
 ```
 **Note:** For real-time voice assessment, this project is best used with GPU. If you are on CPU, the assessment will still work, but may be much slower.
 
