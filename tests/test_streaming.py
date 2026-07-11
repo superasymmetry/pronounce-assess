@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from openvoice import load_model, stream_decode
+from pronounce_assess import load_model, stream_decode
 
 transformers = pytest.importorskip("transformers")
 

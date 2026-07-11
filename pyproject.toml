@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "openvoice"
+name = "pronounce-assess"
 dynamic = ["version"]
 description = "A voice pronunciation assessment library for Python."
 readme = "README.md"
@@ -42,4 +42,4 @@ demo = ["gradio"]
 Homepage = "https://github.com/stringbot/OpenVoice"
 
 [tool.hatch.version]
-path = "openvoice/__init__.py"
+path = "pronounce_assess/__init__.py"

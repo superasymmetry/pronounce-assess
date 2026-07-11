@@ -1,4 +1,4 @@
-# OpenVoice
+# pronounce-assess
 
 A voice pronunciation assessment library for Python. Streams audio through a
 wav2vec2 CTC phoneme model and yields per-phoneme match events
@@ -8,16 +8,16 @@ IPA sequence.
 ## Installation
 
 ```bash
-pip install openvoice   # numpy, torch, transformers, sounddevice, eng-to-ipa
+pip install pronounce-assess   # numpy, torch, transformers, sounddevice, eng-to-ipa
 ```
 
 ## Usage
 
 ```python
-from openvoice import OpenVoiceModel
-from openvoice.audio import ChunkRecord
+from pronounce_assess import PronounceAssessModel
+from pronounce_assess.audio import ChunkRecord
 
-assessor = OpenVoiceModel()  # loads the model; picks cuda/cpu automatically
+assessor = PronounceAssessModel()  # loads the model; picks cuda/cpu automatically
 reference = assessor.sentence_to_phonemes("The quick brown fox")
 
 with ChunkRecord(duration=5, chunk_len=8000) as chunks:
@@ -34,11 +34,11 @@ it audio from a file, a websocket, or anything else — see
 ## Project layout
 
 ```
-openvoice/
+pronounce_assess/
     __init__.py     public API + version
     streaming.py    stream_decode – the core alignment/scoring algorithm
     phonemes.py     IPA normalization, sentence → phoneme conversion
-    models.py       wav2vec2 model/processor loading + OpenVoiceModel
+    models.py       wav2vec2 model/processor loading + PronounceAssessModel
     audio.py        microphone chunk generator (optional, needs sounddevice)
     exceptions.py   error types
 tests/              pytest suite

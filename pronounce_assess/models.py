@@ -1,4 +1,4 @@
-"""Model loading helpers and the high-level OpenVoiceModel."""
+"""Model loading helpers and the high-level PronounceAssessModel."""
 
 DEFAULT_MODEL = "vitouphy/wav2vec2-xls-r-300m-timit-phoneme"
 
@@ -20,13 +20,13 @@ def load_model(device, model_name=DEFAULT_MODEL, hf_token=None):
     return processor, model
 
 
-class OpenVoiceModel:
+class PronounceAssessModel:
     """Bundles the model, processor, and device behind a simple API.
 
     Loads the model once, then exposes the library's operations as methods
     so callers never handle the processor/model pair themselves::
 
-        assessor = OpenVoiceModel()
+        assessor = PronounceAssessModel()
         reference = assessor.sentence_to_phonemes("The quick brown fox")
         for event in assessor.stream_decode(chunks, reference):
             ...
@@ -43,7 +43,7 @@ class OpenVoiceModel:
             self.hf_token = hf_token
         else:
             self.hf_token = None
-            print("Hint: you can pass a HuggingFace token to OpenVoiceModel() to avoid rate limits when loading the model.")
+            print("Hint: you can pass a HuggingFace token to PronounceAssessModel() to avoid rate limits when loading the model.")
         from .utils.prosody_eval import warmup_async
         warmup_async()  # JIT-compile pyin in the background while the model loads
         self.processor, self.model = load_model(device, model_name, self.hf_token)
@@ -70,12 +70,12 @@ class OpenVoiceModel:
     def stream_decode(self, audio_chunks, sample_rate=16000):
         """Evaluate pronunciation from a stream of audio chunks.
 
-        See :func:`openvoice.streaming.stream_decode` for the event format.
+        See :func:`pronounce_assess.streaming.stream_decode` for the event format.
         """
         from .streaming import stream_decode
 
         if self.reference_phonemes is None:
-            from .exceptions import OpenVoiceError
-            raise OpenVoiceError("Reference sentence not set; call set_sentence() first or pass target sentence into OpenVoiceModel constructor.")
+            from .exceptions import PronounceAssessError
+            raise PronounceAssessError("Reference sentence not set; call set_sentence() first or pass target sentence into PronounceAssessModel constructor.")
         return stream_decode(audio_chunks, self.reference_phonemes, self.processor,
                              self.model, self.device, sample_rate)

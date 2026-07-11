@@ -1,10 +1,10 @@
-from openvoice import OpenVoiceModel
-from openvoice.audio import ChunkRecord
+from pronounce_assess import PronounceAssessModel
+from pronounce_assess.audio import ChunkRecord
 
 
 def main():
     print("Loading model...", flush=True)
-    assessor = OpenVoiceModel()
+    assessor = PronounceAssessModel()
     assessor.set_sentence("The quick brown fox jumps over the lazy dog.")
     print("Model loaded. Please start speaking.", flush=True)
 

@@ -21,9 +21,9 @@ def get_model():
     """Load the model once, on first use."""
     global _model
     if _model is None:
-        from openvoice import OpenVoiceModel
+        from pronounce_assess import PronounceAssessModel
 
-        _model = OpenVoiceModel()
+        _model = PronounceAssessModel()
     return _model
 
 
@@ -99,7 +99,7 @@ class LiveSession:
             yield chunk
 
     def _decode(self, model):
-        from openvoice.streaming import stream_decode
+        from pronounce_assess.streaming import stream_decode
 
         for event in stream_decode(self._iter_chunks(), self.reference,
                                    model.processor, model.model, model.device,
@@ -110,10 +110,6 @@ class LiveSession:
                 self.events[event.position] = event
 
     def finish(self):
-        # The final mic batches arrive via .stream() *after* stop_recording
-        # fires; closing the queue right away would drop the last word.
-        # Wait for the feed to go quiet (two stream periods) before sending
-        # the end-of-stream sentinel.
         deadline = time.monotonic() + 4.0
         while (time.monotonic() < deadline
                and time.monotonic() - self.last_chunk_at < 1.5):
@@ -136,10 +132,7 @@ def stream_live(session, sentence, chunk):
         return session, gr.skip()
     if chunk is not None:
         session.add_chunk(to_float_mono_16k(chunk))
-    # Snapshot first: the decode thread inserts concurrently, and iterating
-    # the live dict can raise, which kills the mic stream mid-recording.
     events = dict(session.events)
-    # Mid-stream, only show phonemes heard so far — the strip grows as you speak
     spoken = [(session.reference[i], events[i].label) for i in sorted(events)]
     return session, spoken
 
@@ -150,9 +143,6 @@ def finish_live(session):
     session.finish()
     highlights = render_highlights(session.reference, session.events,
                                    pending_label="not reached")
-    # Keep the finished session in state (not None) so a straggler stream
-    # event hits the finished-guard instead of spawning a fresh session
-    # that would wipe this final render.
     return session, highlights, render_scores(session.reference, session.events,
                                               session.prosody)
 
@@ -181,10 +171,10 @@ def assess(sentence, audio):
 
 
 def build_demo():
-    with gr.Blocks(title="OpenVoice — Pronunciation Assessment") as demo:
+    with gr.Blocks(title="pronounce-assess — Pronunciation Assessment") as demo:
         gr.Markdown(
-            "# OpenVoice pronunciation assessment\n"
-            "Enter a sentence, read it aloud, and watch each phoneme light up as it scores."
+            "# pronounce-assess pronunciation assessment\n"
+            "Try out pronounce-assess's real-time pronunciation assessment in a gradio demo."
         )
         sentence = gr.Textbox(
             label="Reference sentence",
@@ -193,7 +183,7 @@ def build_demo():
         with gr.Tab("Live (microphone)"):
             loading = gr.Markdown("Loading the pronunciation model…")
             mic = gr.Audio(sources=["microphone"], streaming=True, type="numpy",
-                           label="Speak — phonemes score as you go",
+                           label="Speak",
                            visible=False)
             live_state = gr.State(None)
             live_phonemes = gr.HighlightedText(label="Phoneme-level result",
@@ -214,8 +204,6 @@ def build_demo():
             clip_scores = gr.Markdown()
             button.click(assess, inputs=[sentence, clip],
                          outputs=[clip_phonemes, clip_scores])
-        # Load the model on page open; the mic stays hidden behind a loading
-        # indicator until it's ready, so recording can't start too early.
         demo.load(enable_mic, outputs=[mic, loading])
     return demo
 
