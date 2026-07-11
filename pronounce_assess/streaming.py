@@ -1,10 +1,3 @@
-"""Streaming phoneme-level pronunciation assessment.
-
-This is the core of the library: consume a stream of audio chunks, decode
-them with a wav2vec2 CTC phoneme model, align the decoded phonemes against a
-reference phoneme sequence, and yield per-phoneme match events.
-"""
-
 from dataclasses import dataclass
 from typing import Optional
 
@@ -17,7 +10,6 @@ from .utils.prosody_eval import evaluate_prosody, warmup_async
 
 @dataclass
 class StreamEvent:
-    # Phoneme fields — None on the final end-of-stream event
     phoneme: Optional[str] = None
     position: Optional[int] = None
     label: str = ""                 # 'correct' | 'mispronounced' | 'omitted' | 'prosody'
@@ -25,7 +17,6 @@ class StreamEvent:
     target_logit: float = float("nan")
     decoded_logit: float = float("nan")
     gop: Optional[float] = None     # graded Goodness of Pronunciation in (0, 1]; 0.0 omitted
-    # Prosody fields — None until the final event (label 'prosody')
     monotony_score: Optional[float] = None
     rhythm_score: Optional[float] = None
     boundary_score: Optional[float] = None
@@ -33,20 +24,6 @@ class StreamEvent:
 
 
 def gop_score(target_logit, decoded_logit):
-    """Goodness of Pronunciation (Witt & Young 2000; DNN posterior-ratio
-    variant of Hu et al. 2015) mapped to a score in (0, 1].
-
-    Softmax over a frame's CTC logits gives P(phoneme | frame). GOP rates the
-    reference phoneme by the ratio of its posterior to the best competing
-    phoneme's posterior at the same frame. Because ``decoded_logit`` is the
-    argmax phoneme's logit, the softmax normalizer cancels:
-
-        P(target|frame) / P(argmax|frame) = exp(target_logit - decoded_logit)
-
-    Returns 1.0 when the target *is* the argmax phoneme, decaying
-    exponentially as the target loses to a competitor, and None when either
-    logit is unavailable (NaN).
-    """
     if np.isnan(target_logit) or np.isnan(decoded_logit):
         return None
     return float(np.exp(min(target_logit - decoded_logit, 0.0)))
@@ -76,12 +53,6 @@ def stream_decode(audio_chunks, reference_phonemes, processor, model,
     reference_phonemes = [p for p in reference_phonemes if p != "ˈ"]
     pointer = 0
     phoneme2id = processor.tokenizer.get_vocab()
-    # Reverse map: normalized phoneme -> every vocab id that realizes it.
-    # The vocab keys are raw tokens ('ɹ', 'v'), while references arrive as
-    # eng_to_ipa output ('r'), so looking up normalize(reference) directly
-    # misses ids ('r' is not a vocab key) or lands on the wrong one ('v'
-    # normalizes to 'f'). Scoring takes the max logit over the group so any
-    # acceptable realization of the target counts.
     special_ids = set(processor.tokenizer.all_special_ids)
     norm2ids = {}
     for tok, tid in phoneme2id.items():
@@ -127,8 +98,6 @@ def stream_decode(audio_chunks, reference_phonemes, processor, model,
                 phoneme_logits.append(logits_np[fi, idx])
                 chunk_frames.append(fi)
 
-        # Pre-align: if no chunk phonemes match at the current pointer, scan forward/backward
-        # to detect whether the user skipped over some reference phonemes.
         if chunk_phonemes and pointer < len(reference_phonemes):
             current_count = sum(
                 1 for di, dp in enumerate(chunk_phonemes)

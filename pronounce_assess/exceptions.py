@@ -1,13 +1,9 @@
-"""Exceptions raised by pronounce-assess."""
-
 
 class PronounceAssessError(Exception):
-    """Base class for all pronounce-assess errors."""
-
+    pass
 
 class AudioError(PronounceAssessError):
-    """Raised when audio cannot be loaded or processed."""
-
+    pass
 
 class AssessmentError(PronounceAssessError):
-    """Raised when a pronunciation assessment fails."""
+    pass

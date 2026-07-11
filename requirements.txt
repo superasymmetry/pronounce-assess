@@ -1,0 +1,8 @@
+gradio
+numpy
+torch
+transformers
+librosa
+eng-to-ipa
+cmudict
+sounddevice
