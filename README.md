@@ -28,9 +28,12 @@ with ChunkRecord(duration=5, chunk_len=8000) as chunks:
 The lower-level pieces (`load_model`, `sentence_to_phonemes`, `stream_decode`)
 remain available if you want to manage the processor/model pair yourself.
 `stream_decode` accepts any iterable of float32 numpy chunks, so you can feed
-it audio from a file, a websocket, or anything else — see
-[examples/live_mic_demo.py](examples/live_mic_demo.py) for a live-microphone demo.
-
+it audio from a file, a websocket, or anything else.
+See [examples/live_mic_demo.py](examples/live_mic_demo.py) for a live-microphone demo.
+For a gradio demo, clone the project and run 
+```
+uv run .\examples\gradio_demo.py
+```
 
 ## Development
 
