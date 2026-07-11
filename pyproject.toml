@@ -30,10 +30,13 @@ dependencies = [
     "torch",
     "transformers",
     "sounddevice",
+    "librosa",
+    "cmudict",
 ]
 
 [project.optional-dependencies]
 dev = ["pytest"]
+demo = ["gradio"]
 
 [project.urls]
 Homepage = "https://github.com/stringbot/OpenVoice"

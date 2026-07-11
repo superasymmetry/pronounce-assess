@@ -3,7 +3,7 @@
 DEFAULT_MODEL = "vitouphy/wav2vec2-xls-r-300m-timit-phoneme"
 
 
-def load_model(device, model_name=DEFAULT_MODEL):
+def load_model(device, model_name=DEFAULT_MODEL, hf_token=None):
     """Load a wav2vec2 CTC phoneme model and its processor.
 
     Returns:
@@ -12,7 +12,10 @@ def load_model(device, model_name=DEFAULT_MODEL):
     from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
 
     processor = Wav2Vec2Processor.from_pretrained(model_name)
-    model = Wav2Vec2ForCTC.from_pretrained(model_name).eval()
+    if hf_token is not None:
+        model = Wav2Vec2ForCTC.from_pretrained(model_name, use_auth_token=hf_token).eval()
+    else:
+        model = Wav2Vec2ForCTC.from_pretrained(model_name).eval()
     model.to(device)
     return processor, model
 
@@ -29,14 +32,21 @@ class OpenVoiceModel:
             ...
     """
 
-    def __init__(self, sentence=None, model_name=DEFAULT_MODEL, device=None):
+    def __init__(self, sentence=None, model_name=DEFAULT_MODEL, device=None, hf_token=None):
         if device is None:
             import torch
 
             device = "cuda" if torch.cuda.is_available() else "cpu"
         self.device = device
         self.model_name = model_name
-        self.processor, self.model = load_model(device, model_name)
+        if hf_token is not None:
+            self.hf_token = hf_token
+        else:
+            self.hf_token = None
+            print("Hint: you can pass a HuggingFace token to OpenVoiceModel() to avoid rate limits when loading the model.")
+        from .utils.prosody_eval import warmup_async
+        warmup_async()  # JIT-compile pyin in the background while the model loads
+        self.processor, self.model = load_model(device, model_name, self.hf_token)
         self.reference_phonemes = None
         if sentence is not None:
             self.set_sentence(sentence)
@@ -46,6 +56,12 @@ class OpenVoiceModel:
         from .phonemes import sentence_to_phonemes
 
         return sentence_to_phonemes(sentence, self.processor)
+
+    def get_phonemes(self):
+        """Return every phoneme token the model can parse, ordered by vocabulary id."""
+        from .phonemes import vocabulary
+
+        return vocabulary(self.processor)
 
     def set_sentence(self, sentence):
         """Set the reference sentence for pronunciation assessment."""
