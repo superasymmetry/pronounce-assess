@@ -1,21 +1,15 @@
----
-title: pronounce-assess
-app_file: app.py
-sdk: gradio
-sdk_version: 6.20.0
----
 # pronounce-assess
 
-A voice pronunciation assessment library for Python. Streams audio through a
-wav2vec2 CTC phoneme model and yields per-phoneme match events
-(`correct` / `mispronounced` / `omitted` / `insertion`) against a reference
-IPA sequence.
+A simple-to-use, real-time voice pronunciation assessment library for Python.
+
+https://github.com/user-attachments/assets/d95f2955-d778-4ab6-8f20-2872627a4e2c
 
 ## Installation
 
 ```bash
 pip install pronounce-assess   # numpy, torch, transformers, sounddevice, eng-to-ipa
 ```
+**Note:** For real-time voice assessment, this project is best used with GPU. If you are on CPU, the assessment will still work, but may be much slower.
 
 ## Usage
 
@@ -37,19 +31,6 @@ remain available if you want to manage the processor/model pair yourself.
 it audio from a file, a websocket, or anything else — see
 [examples/live_mic_demo.py](examples/live_mic_demo.py) for a live-microphone demo.
 
-## Project layout
-
-```
-pronounce_assess/
-    __init__.py     public API + version
-    streaming.py    stream_decode – the core alignment/scoring algorithm
-    phonemes.py     IPA normalization, sentence → phoneme conversion
-    models.py       wav2vec2 model/processor loading + PronounceAssessModel
-    audio.py        microphone chunk generator (optional, needs sounddevice)
-    exceptions.py   error types
-tests/              pytest suite
-examples/           runnable demo scripts
-```
 
 ## Development
 
