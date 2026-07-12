@@ -2,6 +2,8 @@
 
 A simple-to-use, real-time voice pronunciation assessment library for Python.
 
+This library was created because there was a lack of such open-source tools. The only similar tools that inspired this library are the [Azure AI Foundry API](https://ai.azure.com/explore/aiservices/speech/pronunciationassessment) and [SpeechSuper](https://www.speechsuper.com/).
+
 https://github.com/user-attachments/assets/d95f2955-d778-4ab6-8f20-2872627a4e2c
 
 ## Installation
