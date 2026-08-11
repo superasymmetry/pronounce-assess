@@ -6,7 +6,7 @@ This library was created because there was a lack of such open-source tools. The
 
 https://github.com/user-attachments/assets/d95f2955-d778-4ab6-8f20-2872627a4e2c
 
-If you would like any feature not currently included, I would be happy to make it for you! [Suggestion form](https://forms.gle/Bc9WRUeAaS2VTRmU7)
+**If you would like any feature not currently included, I would be happy to make it for you!** [Suggestion form](https://forms.gle/Bc9WRUeAaS2VTRmU7)
 
 ## Installation
 
